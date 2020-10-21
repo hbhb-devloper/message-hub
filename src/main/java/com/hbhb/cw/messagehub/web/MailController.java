@@ -30,7 +30,7 @@ public class MailController implements MailApi {
     public void postMail(
             @Parameter(description = "接收人", required = true) @RequestParam String receiver,
             @Parameter(description = "标题", required = true) @RequestParam String title,
-            @Parameter(description = "内容", required = true) @RequestParam String content) {
-        mailService.sendSimpleMailMessage(receiver, title, content);
+            @Parameter(description = "内容（可包含html元素）", required = true) @RequestParam String content) {
+        mailService.sendMimeMessage(receiver, title, content);
     }
 }
