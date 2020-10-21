@@ -2,15 +2,14 @@ package com.hbhb.cw.messagehub.web;
 
 import com.hbhb.cw.messagehub.api.MailApi;
 import com.hbhb.cw.messagehub.service.MailService;
+import com.hbhb.cw.messagehub.vo.MailVO;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
@@ -27,10 +26,7 @@ public class MailController implements MailApi {
 
     @Operation(summary = "发送邮件")
     @Override
-    public void postMail(
-            @Parameter(description = "接收人", required = true) @RequestParam String receiver,
-            @Parameter(description = "标题", required = true) @RequestParam String title,
-            @Parameter(description = "内容（可包含html元素）", required = true) @RequestParam String content) {
-        mailService.sendMimeMessage(receiver, title, content);
+    public void postMail(MailVO vo) {
+        mailService.sendMimeMessage(vo.getReceiver(), vo.getTitle(), vo.getContent());
     }
 }
