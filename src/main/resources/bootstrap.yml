@@ -9,13 +9,12 @@ spring:
     name: @project.artifactId@
   cloud:
     consul:
-#      host: consul.yeexun.com.cn
-      host: ${host.docker0-ip}
+      host: ${host.actual-ip}
       discovery:
         prefer-ip-address: true
         instance-id: ${spring.application.name}-${server.port}-${spring.cloud.client.ip-address}
         service-name: ${spring.application.name}
-        health-check-url: http://${host.docker0-ip}:${host.map-port}/actuator/health
+        health-check-url: http://${host.actual-ip}:${host.map-port}/actuator/health
       config:
         format: yaml
         prefix: config/${spring.application.name}
@@ -48,8 +47,8 @@ management:
 
 # 宿主机相关配置
 host:
-  # docker0的ip地址
-  docker0-ip: 172.17.0.1
+  # 宿主机ip地址
+  actual-ip: 112.13.201.108
   # 线上环境映射的端口
   map-port: 10012
 #  map-port: 10056
