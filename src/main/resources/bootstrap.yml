@@ -9,7 +9,8 @@ spring:
     name: @project.artifactId@
   cloud:
     consul:
-      host: ${host.actual-ip}
+#      host: ${host.actual-ip}
+      host: ${host.docker0-ip}
       discovery:
         prefer-ip-address: true
         instance-id: ${spring.application.name}-${server.port}-${spring.cloud.client.ip-address}
@@ -47,6 +48,8 @@ management:
 
 # 宿主机相关配置
 host:
+  # docker0地址
+  docker0-ip: 172.17.0.1
   # 宿主机ip地址
   actual-ip: 112.13.201.108
   # 线上环境映射的端口
