@@ -5,17 +5,12 @@ server:
     enabled: true
 
 spring:
+  profiles:
+    active: @env@
   application:
     name: @project.artifactId@
   cloud:
     consul:
-#      host: ${host.actual-ip}
-      host: ${host.docker0-ip}
-      discovery:
-        prefer-ip-address: true
-        instance-id: ${spring.application.name}-${server.port}-${spring.cloud.client.ip-address}
-        service-name: ${spring.application.name}
-        health-check-url: http://${host.actual-ip}:${host.map-port}/actuator/health
       config:
         format: yaml
         prefix: config/${spring.application.name}
@@ -49,9 +44,42 @@ management:
 # 宿主机相关配置
 host:
   # docker0地址
-  docker0-ip: 172.17.0.1
-  # 宿主机ip地址
-  actual-ip: 112.13.201.108
-  # 线上环境映射的端口
-  map-port: 10012
-#  map-port: 10056
+  docker0: 172.17.0.1
+  # 代理ip（解决docker容器内部无法访问宿主机ip的问题）
+  proxy: 47.96.83.55
+
+port:
+  # 本地调试端口
+  debug: 10056
+  # 代理端口
+  proxy: 10002
+
+################### 本地环境配置 ###################
+---
+spring:
+  profiles: default
+  cloud:
+    consul:
+      host: consul.yeexun.com.cn
+      discovery:
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}-${server.port}-${spring.cloud.client.ip-address}
+        service-name: ${spring.application.name}
+        # 本地调试使用frp代理ip
+        health-check-url: http://${host.docker0}:${port.debug}/actuator/health
+
+################### 线上环境配置 ###################
+---
+spring:
+  profiles: dev, test, prd
+  cloud:
+    consul:
+      host: ${host.docker0}
+      discovery:
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}-${server.port}-${spring.cloud.client.ip-address}
+        service-name: ${spring.application.name}
+        # 本地调试使用frp代理ip
+        health-check-url: http://${host.proxy}:${port.proxy}/actuator/health
+        hostname: ${host.proxy}
+        port: ${port.proxy}
