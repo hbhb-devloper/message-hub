@@ -41,6 +41,7 @@ public class MailServiceImpl implements MailService {
         message.setText(content);
         try {
             mailSender.send(message);
+            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
         } catch (Exception e) {
             log.error("发送简单邮件时发生异常!", e);
         }
@@ -57,6 +58,7 @@ public class MailServiceImpl implements MailService {
             helper.setSubject(subject);
             helper.setText(content, true);
             mailSender.send(message);
+            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
         } catch (MessagingException e) {
             log.error("发送MimeMessge时发生异常！", e);
         }
@@ -79,6 +81,7 @@ public class MailServiceImpl implements MailService {
             helper.addAttachment(fileName, file);
 
             mailSender.send(message);
+            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
         } catch (MessagingException e) {
             log.error("发送带附件的MimeMessge时发生异常！", e);
         }
@@ -100,6 +103,7 @@ public class MailServiceImpl implements MailService {
                 helper.addInline(entry.getKey(), file);
             }
             mailSender.send(message);
+            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
         } catch (MessagingException e) {
             log.error("发送带静态文件的MimeMessge时发生异常！", e);
         }
