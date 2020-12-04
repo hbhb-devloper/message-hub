@@ -45,4 +45,9 @@ public interface MailService {
      * @param rscIdMap 需要替换的静态文件
      */
     void sendMimeMessage(String to, String subject, String content, Map<String, String> rscIdMap);
+
+    /**
+     * 支持多个邮箱轮换
+     */
+    boolean send(String to, String subject, String content);
 }

@@ -27,6 +27,11 @@ public class MailController implements MailApi {
     @Operation(summary = "发送邮件")
     @Override
     public void postMail(MailVO vo) {
-        mailService.sendMimeMessage(vo.getReceiver(), vo.getTitle(), vo.getContent());
+        // 多个邮箱轮换策略
+        while (true) {
+            if (mailService.send(vo.getReceiver(), vo.getTitle(), vo.getContent())) {
+                break;
+            }
+        }
     }
 }

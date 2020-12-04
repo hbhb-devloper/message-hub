@@ -1,16 +1,22 @@
 package com.hbhb.cw.messagehub.service.impl;
 
+import com.hbhb.cw.messagehub.config.MailConfig;
 import com.hbhb.cw.messagehub.service.MailService;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.annotation.Resource;
 import javax.mail.MessagingException;
@@ -28,6 +34,8 @@ public class MailServiceImpl implements MailService {
 
     @Resource
     private JavaMailSender mailSender;
+    @Resource
+    private MailConfig mailConfig;
 
     @Value("${spring.mail.username}")
     private String sender;
@@ -41,7 +49,7 @@ public class MailServiceImpl implements MailService {
         message.setText(content);
         try {
             mailSender.send(message);
-            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
+            log.info("[{}]成功发送邮件[{}][{}]到{}", sender, subject, content, to);
         } catch (Exception e) {
             log.error("发送简单邮件时发生异常!", e);
         }
@@ -58,11 +66,12 @@ public class MailServiceImpl implements MailService {
             helper.setSubject(subject);
             helper.setText(content, true);
             mailSender.send(message);
-            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
+            log.info("[{}]成功发送邮件[{}][{}]到{}", sender, subject, content, to);
         } catch (MessagingException e) {
             log.error("发送MimeMessge时发生异常！", e);
         }
     }
+
 
     @Override
     public void sendMimeMessage(String to, String subject, String content, String filePath) {
@@ -81,7 +90,7 @@ public class MailServiceImpl implements MailService {
             helper.addAttachment(fileName, file);
 
             mailSender.send(message);
-            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
+            log.info("[{}]成功发送邮件[{}][{}]到{}", sender, subject, content, to);
         } catch (MessagingException e) {
             log.error("发送带附件的MimeMessge时发生异常！", e);
         }
@@ -103,9 +112,33 @@ public class MailServiceImpl implements MailService {
                 helper.addInline(entry.getKey(), file);
             }
             mailSender.send(message);
-            log.info("成功发送邮件[{}, {}]到{}", subject, content, to);
+            log.info("[{}]成功发送邮件[{}][{}]到{}", sender, subject, content, to);
         } catch (MessagingException e) {
             log.error("发送带静态文件的MimeMessge时发生异常！", e);
         }
+    }
+
+    @Override
+    public boolean send(String to, String subject, String content) {
+        // 多个发送邮箱轮换
+        JavaMailSenderImpl sender = mailConfig.getSender();
+        if (sender != null) {
+            try {
+                MimeMessage message = sender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
+                helper.setFrom(Objects.requireNonNull(sender.getUsername()), "杭州移动财务管理系统");
+                helper.setTo(to);
+                helper.setSubject(subject);
+                helper.setText(content, true);
+                sender.send(message);
+                log.info("[{}]成功发送邮件[{}][{}]到[{}]", Objects.requireNonNull(sender.getUsername()), subject, content, to);
+                return true;
+            } catch (MailSendException | MessagingException | UnsupportedEncodingException e) {
+                if (e instanceof MailSendException) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }
