@@ -49,5 +49,5 @@ public interface MailService {
     /**
      * 支持多个邮箱轮换
      */
-    boolean send(String to, String subject, String content);
+    boolean send(int index, String to, String subject, String content);
 }

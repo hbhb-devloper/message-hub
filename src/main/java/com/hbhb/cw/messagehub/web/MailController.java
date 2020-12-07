@@ -33,8 +33,8 @@ public class MailController implements MailApi {
     @Override
     public void postMail(MailVO vo) {
         // 多个邮箱轮换策略
-        for (String ignored : senders) {
-            if (mailService.send(vo.getReceiver(), vo.getTitle(), vo.getContent())) {
+        for (int i = 0; i < senders.size(); i++) {
+            if (mailService.send(i, vo.getReceiver(), vo.getTitle(), vo.getContent())) {
                 break;
             }
         }

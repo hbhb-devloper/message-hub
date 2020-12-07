@@ -119,9 +119,9 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public boolean send(String to, String subject, String content) {
+    public boolean send(int index, String to, String subject, String content) {
         // 多个发送邮箱轮换
-        JavaMailSenderImpl sender = mailConfig.getSender();
+        JavaMailSenderImpl sender = mailConfig.getSender(index);
         if (sender != null) {
             try {
                 MimeMessage message = sender.createMimeMessage();

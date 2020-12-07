@@ -25,7 +25,6 @@ public class MailConfig extends JavaMailSenderImpl implements JavaMailSender {
     private List<String> usernameList;
     private List<JavaMailSenderImpl> senders;
     private final MailProperties properties;
-    private Integer index = 0;
 
     public MailConfig(MailProperties properties) {
         this.properties = properties;
@@ -56,10 +55,10 @@ public class MailConfig extends JavaMailSenderImpl implements JavaMailSender {
         });
     }
 
-    public JavaMailSenderImpl getSender() {
+    public JavaMailSenderImpl getSender(int index) {
         if (senders.isEmpty()) {
             buildSender();
         }
-        return senders.get(index++);
+        return senders.get(index);
     }
 }
