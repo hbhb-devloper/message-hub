@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 public class MailConfig extends JavaMailSenderImpl implements JavaMailSender {
 
     private List<String> usernameList;
+    private List<String> passwordList;
     private List<JavaMailSenderImpl> senders;
     private final MailProperties properties;
 
@@ -36,6 +37,13 @@ public class MailConfig extends JavaMailSenderImpl implements JavaMailSender {
         String[] userNames = this.properties.getUsername().split(",");
         Collections.addAll(usernameList, userNames);
 
+        // 初始化密码
+        if (passwordList == null) {
+            passwordList = new ArrayList<>();
+        }
+        String[] passwords = this.properties.getPassword().split(",");
+        Collections.addAll(passwordList, passwords);
+
         if (senders == null) {
             senders = new ArrayList<>();
         }
@@ -43,16 +51,16 @@ public class MailConfig extends JavaMailSenderImpl implements JavaMailSender {
 
     @PostConstruct
     public void buildSender() {
-        usernameList.forEach(username -> {
+        for (int i = 0; i < usernameList.size(); i++) {
             JavaMailSenderImpl sender = new JavaMailSenderImpl();
             sender.setDefaultEncoding(this.properties.getDefaultEncoding().name());
             sender.setHost(this.properties.getHost());
             sender.setPort(this.properties.getPort());
             sender.setProtocol(this.properties.getProtocol());
-            sender.setUsername(username);
-            sender.setPassword(this.properties.getPassword());
+            sender.setUsername(usernameList.get(i));
+            sender.setPassword(passwordList.get(i));
             senders.add(sender);
-        });
+        }
     }
 
     public JavaMailSenderImpl getSender(int index) {
